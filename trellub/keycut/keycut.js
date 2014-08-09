@@ -55,10 +55,9 @@
     var userCommand = Object.keys(_currentCommand).some(_k.isNegative);
 
     if (userCommand) {
+      console.log('user Command ', userCommand);
       if (_currentCommand[-keyCode]) {
-        console.log('found command ', String.fromCharCode.apply(String,_commandSequence));
         _currentCommand = _currentCommand[-keyCode];
-        _commandSequence = [];
       }
       else {
         _commandSequence.push(keyCode);
@@ -66,13 +65,14 @@
     }
     else {
       _currentCommand = _k.isEmpty(_currentCommand) ? commandTree[keyCode] : _currentCommand[keyCode];
-
-      if ( _currentCommand && _currentCommand.done ) {
-        _currentCommand.done.call(null, _currentCommand );
-        _commandSequence = [];
-      }
-
       _currentCommand = _currentCommand || {};
+    }
+
+    console.log('_currentCommand ', _currentCommand);
+    if ( _currentCommand && _currentCommand.done ) {
+      _currentCommand.commandSeq = String.fromCharCode.apply(String,_commandSequence);
+      _currentCommand.done.call(null, _currentCommand );
+      _commandSequence = [];
     }
   });
 
@@ -81,7 +81,6 @@
     if (!command) {
       throw new Error('unable to parse pattern "' + pattern +'"');
     }
-    console.log('parsedCommand : ', command);
     return command.filter(_k.length);
   }
 
